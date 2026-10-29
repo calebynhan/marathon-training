@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f8ef">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Miles">
+<title>Miles</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="scene" aria-hidden="true">
+  <div class="sky-wash"></div>
+  <svg class="cloud cloud-a" viewBox="0 0 170 70"><path d="M22 58c-12 0-20-8-20-17s8-16 18-16c2-12 13-21 26-21 11 0 20 6 24 15 4-3 9-4 14-4 14 0 25 10 26 23 2-1 5-1 7-1 10 0 18 7 18 16s-8 15-18 15H22z"/></svg>
+  <svg class="cloud cloud-b" viewBox="0 0 170 70"><path d="M22 58c-12 0-20-8-20-17s8-16 18-16c2-12 13-21 26-21 11 0 20 6 24 15 4-3 9-4 14-4 14 0 25 10 26 23 2-1 5-1 7-1 10 0 18 7 18 16s-8 15-18 15H22z"/></svg>
+  <svg class="cloud cloud-c" viewBox="0 0 170 70"><path d="M22 58c-12 0-20-8-20-17s8-16 18-16c2-12 13-21 26-21 11 0 20 6 24 15 4-3 9-4 14-4 14 0 25 10 26 23 2-1 5-1 7-1 10 0 18 7 18 16s-8 15-18 15H22z"/></svg>
+  <svg class="hills" viewBox="0 0 760 300" preserveAspectRatio="xMidYMax slice">
+    <path d="M0 150 C120 95 230 105 330 140 S560 90 760 125 V300 H0Z" fill="#dfe9cc"/>
+    <path d="M0 200 C140 160 250 175 380 195 S620 150 760 180 V300 H0Z" fill="#cfe0b2"/>
+    <g fill="#b9d093"><circle cx="612" cy="160" r="15"/><circle cx="628" cy="152" r="18"/><circle cx="645" cy="161" r="14"/><rect x="626" y="162" width="4" height="16" rx="2" fill="#93ad6c"/></g>
+    <g fill="#c2d79f"><circle cx="118" cy="168" r="11"/><circle cx="130" cy="162" r="13"/><circle cx="142" cy="169" r="10"/><rect x="128" y="171" width="3" height="11" rx="1.5" fill="#9cb676"/></g>
+    <path d="M0 245 C160 215 300 230 420 240 S640 215 760 232 V300 H0Z" fill="#bcd398"/>
+    <g stroke="#9fbb79" stroke-width="2" stroke-linecap="round" fill="none">
+      <path d="M60 252 q2 -10 6 -14 M66 252 q0 -9 -4 -13 M72 252 q3 -8 8 -10"/>
+      <path d="M300 246 q2 -10 6 -14 M306 246 q0 -9 -4 -13"/>
+      <path d="M520 241 q2 -10 6 -14 M526 241 q0 -9 -4 -13 M532 241 q3 -8 8 -10"/>
+      <path d="M700 238 q2 -9 6 -13 M706 238 q0 -8 -4 -12"/>
+    </g>
+  </svg>
+</div>
+<div class="app">
+  <header class="bar">
+    <button class="date" id="dateBtn" type="button" aria-label="Jump to today"></button>
+    <button class="icon" id="viewBtn" type="button" aria-label="Show calendar"></button>
+  </header>
+
+  <main id="day" class="view day" aria-live="polite">
+    <section class="hero" id="hero">
+      <p class="type" id="type"></p>
+      <p class="miles" id="miles"></p>
+      <svg class="sprig" id="sprig" viewBox="0 0 96 96" aria-hidden="true" hidden><path d="M20 84 C34 64 48 46 74 22" fill="none" stroke="#8fae6a" stroke-width="2.5" stroke-linecap="round"/><path d="M40 58 C30 52 24 40 28 30 C40 34 46 46 40 58Z" fill="#c8dba6"/><path d="M54 42 C64 30 76 28 84 32 C80 44 66 48 54 42Z" fill="#b3cc8a"/><path d="M30 72 C20 70 12 62 12 54 C24 54 32 62 30 72Z" fill="#d8e5c0"/><path d="M66 30 C62 20 64 12 70 6 C76 14 74 24 66 30Z" fill="#c8dba6"/></svg>
+      <ul class="steps" id="steps"></ul>
+      <p class="pace" id="pace"></p>
+      <button class="chip" id="strength" type="button" hidden></button>
+    </section>
+
+    <nav class="week" aria-label="This week">
+      <div class="ribbon" id="ribbon"></div>
+      <div class="weekfoot">
+        <button class="step" id="prev" type="button" aria-label="Previous day">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <p class="wk" id="wk"></p>
+        <button class="step" id="next" type="button" aria-label="Next day">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </nav>
+  </main>
+
+  <main id="cal" class="view cal" hidden>
+    <div class="calhead" aria-hidden="true">
+      <span></span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span></span>
+    </div>
+    <div class="grid" id="grid" role="grid" aria-label="Training calendar"></div>
+  </main>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="scrim" data-close></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grab" aria-hidden="true"></div>
+    <h2 id="sheetTitle"></h2>
+    <ol id="sheetList"></ol>
+    <p class="sheetnote" id="sheetNote"></p>
+    <button class="done" type="button" data-close>Done</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
