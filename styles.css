@@ -324,3 +324,8 @@ body.on-cal .cloud { opacity: .4; }
 .bar-day.ran:hover .b { background: #9cc07a; }
 .bar-day.ran.on .b, .bar-day.ran.on:hover .b { background: var(--blue); }
 .cell.ran::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 12px; height: 2.5px; margin-left: -6px; border-radius: 2px; background: currentColor; opacity: .7; }
+
+/* Actual vs goal */
+.row .t small { display: block; margin-top: 3px; font: 600 12px/1 var(--num); color: var(--slate); }
+.date .tally { margin-left: 12px; font: 600 16px/1 var(--num); color: var(--slate); }
+.date .tally b { color: var(--blue); font-weight: 700; }

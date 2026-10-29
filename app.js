@@ -2,6 +2,7 @@
   const PLAN = window.PLAN;
   const DONE = window.DONE || {};
   PLAN.forEach((d) => {
+    d.goal = d.mi;
     const r = DONE[d.d];
     if (r) { d.plan = d.t === "Done" ? null : d.mi; d.mi = r.mi; d.t = "Done"; d.x = [r.pace]; }
     if (d.t === "Done") d.done = true;
@@ -47,8 +48,17 @@
   let sel = clampIndex(todayKey());
   let view = "day";
 
-  const weekTotals = {};
-  PLAN.forEach((d) => { weekTotals[d.w] = (weekTotals[d.w] || 0) + d.mi; });
+  // Goal = planned miles. Ran = miles actually synced from Strava.
+  const r1 = (n) => Math.round(n * 10) / 10;
+  const weekGoal = {}, weekRan = {}, weekStart = {};
+  PLAN.forEach((d) => {
+    weekGoal[d.w] = (weekGoal[d.w] || 0) + d.goal;
+    weekRan[d.w] = (weekRan[d.w] || 0) + (d.done ? d.mi : 0);
+    if (!(d.w in weekStart)) weekStart[d.w] = d.d;
+  });
+  const started = (w) => weekStart[w] <= todayKey();
+  const totalGoal = r1(PLAN.reduce((a, d) => a + d.goal, 0));
+  const totalRan = r1(PLAN.reduce((a, d) => a + (d.done ? d.mi : 0), 0));
 
   function paceLine(d) {
     switch (d.t) {
@@ -135,7 +145,10 @@
       b.addEventListener("click", () => go(byDate.get(x.d)));
       ribbon.appendChild(b);
     });
-    $("wk").innerHTML = `Week ${d.w}&ensp;<b>${fmtMi(Math.round(weekTotals[d.w] * 10) / 10)} mi</b>`;
+    const goal = fmtMi(r1(weekGoal[d.w]));
+    $("wk").innerHTML = started(d.w)
+      ? `Week ${d.w}&ensp;<b>${fmtMi(r1(weekRan[d.w]))}</b> of ${goal} mi`
+      : `Week ${d.w}&ensp;<b>${goal} mi</b>`;
   }
 
   function cellColor(mi) {
@@ -189,7 +202,9 @@
       });
       const t = document.createElement("span");
       t.className = "t";
-      t.textContent = fmtMi(Math.round(weekTotals[w] * 10) / 10);
+      const goal = fmtMi(r1(weekGoal[w]));
+      if (started(w)) t.innerHTML = `${fmtMi(r1(weekRan[w]))}<small>${goal}</small>`;
+      else t.textContent = goal;
       row.appendChild(t);
       grid.appendChild(row);
     });
@@ -205,7 +220,7 @@
     btn.setAttribute("aria-label", v === "day" ? "Show calendar" : "Show day");
     if (v === "cal") {
       renderCal();
-      $("dateBtn").innerHTML = "Plan";
+      $("dateBtn").innerHTML = `Plan<span class="tally"><b>${fmtMi(totalRan)}</b> of ${fmtMi(totalGoal)} mi</span>`;
       $("dateBtn").classList.add("is-today");
       const cur = document.querySelector(".row.current");
       if (cur) cur.scrollIntoView({ block: "center" });
