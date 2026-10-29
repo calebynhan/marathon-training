@@ -21,9 +21,11 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
-html { background: #e3edf0; }
+html { background-color: #e3edf0; }
 body {
-  background: var(--paper) linear-gradient(#e3edf0, var(--paper) 340px) no-repeat;
+  background-color: #e3edf0;
+  background-image: linear-gradient(#e3edf0 0, var(--paper) 340px, var(--paper) 100%);
+  min-height: 100dvh;
   color: var(--navy);
   font: 400 17px/1.45 var(--text);
   -webkit-font-smoothing: antialiased;
