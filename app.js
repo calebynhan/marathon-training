@@ -1,5 +1,11 @@
 (() => {
   const PLAN = window.PLAN;
+  const DONE = window.DONE || {};
+  PLAN.forEach((d) => {
+    const r = DONE[d.d];
+    if (r) { d.plan = d.t === "Done" ? null : d.mi; d.mi = r.mi; d.t = "Done"; d.x = [r.pace]; }
+    if (d.t === "Done") d.done = true;
+  });
   const byDate = new Map(PLAN.map((d, i) => [d.d, i]));
   const $ = (id) => document.getElementById(id);
 
@@ -88,7 +94,9 @@
       steps.appendChild(li);
     });
 
-    $("pace").innerHTML = d.t === "Done" ? `Done at <b>${d.x[0]}</b>` : paceLine(d);
+    $("pace").innerHTML = d.done
+      ? `Done at <b>${d.x[0]}</b>` + (d.plan != null && d.plan !== d.mi ? `, planned ${d.plan ? fmtMi(d.plan) + " mi" : "rest"}` : "")
+      : paceLine(d);
 
     const chip = $("strength");
     if (d.s) {
@@ -117,6 +125,7 @@
       b.type = "button";
       b.className = "bar-day";
       if (x.mi === 0) b.classList.add("rest");
+      if (x.done) b.classList.add("ran");
       if (x.d === d.d) b.classList.add("on");
       if (x.d === today) b.classList.add("today");
       const dt = parse(x.d);
@@ -171,9 +180,10 @@
         if (col) { c.style.background = col.bg; c.style.color = col.fg; }
         if (d.t === "Race") c.classList.add("race");
         if (d.d === today) c.classList.add("today");
-        if (d.d < today) c.classList.add("past");
+        if (d.done) c.classList.add("ran");
+        else if (d.d < today) c.classList.add("past");
         c.textContent = d.mi ? fmtMi(d.mi) : "";
-        c.setAttribute("aria-label", `${weekdays[dt.getDay()]} ${months[dt.getMonth()]} ${dt.getDate()}, ${d.mi ? fmtMi(d.mi) + " miles " + d.t : "rest"}`);
+        c.setAttribute("aria-label", `${weekdays[dt.getDay()]} ${months[dt.getMonth()]} ${dt.getDate()}, ${d.mi ? fmtMi(d.mi) + " miles " + d.t : "rest"}${d.done ? ", done" : ""}`);
         c.addEventListener("click", () => { sel = byDate.get(d.d); setView("day"); });
         row.appendChild(c);
       });

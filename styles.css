@@ -318,3 +318,9 @@ body.on-cal .cloud { opacity: .4; }
 .bar-day .n, .bar-day .l { color: #56684a; }
 .wk { color: #4d5e42; }
 .calhead { border-radius: 12px; }
+
+/* Runs synced from Strava */
+.bar-day.ran .b { background: #a9c98a; box-shadow: none; }
+.bar-day.ran:hover .b { background: #9cc07a; }
+.bar-day.ran.on .b, .bar-day.ran.on:hover .b { background: var(--blue); }
+.cell.ran::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 12px; height: 2.5px; margin-left: -6px; border-radius: 2px; background: currentColor; opacity: .7; }
