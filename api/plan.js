@@ -85,7 +85,7 @@ Fields per day:
 
 Also give paces as m:ss–m:ss per mile (use an en dash): "easy", "long", "tempo", "goal" (goal is race pace), and a "note" of at most 2 short sentences for the runner.
 
-Call save_plan once.`;
+Call the save_plan tool once with the whole plan. Do not write anything else.`;
 }
 
 const TOOL = {
@@ -197,7 +197,7 @@ module.exports = async function handler(req, res) {
         stream: true,
         system: "You are an experienced running coach. You write safe, progressive, specific training plans and return them only through the save_plan tool.",
         tools: [TOOL],
-        tool_choice: { type: "tool", name: "save_plan" },
+        tool_choice: { type: "auto" },
         messages: [{ role: "user", content: prompt(input) }],
       }),
     });
@@ -208,7 +208,7 @@ module.exports = async function handler(req, res) {
       return res.end();
     }
 
-    let json = "", buf = "", last = 0;
+    let json = "", text = "", buf = "", last = 0;
     const dec = new TextDecoder();
     for await (const chunk of r.body) {
       buf += dec.decode(chunk, { stream: true });
@@ -222,12 +222,23 @@ module.exports = async function handler(req, res) {
         if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "input_json_delta") {
           json += ev.delta.partial_json;
           if (json.length - last > 400) { last = json.length; send({ p: json.length }); }
+        } else if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "text_delta") {
+          text += ev.delta.text;
+          if (text.length - last > 400) { last = text.length; send({ p: text.length }); }
         } else if (ev.type === "error") {
           throw new Error("stream error " + JSON.stringify(ev.error || {}));
         }
       }
     }
-    const result = build(input, JSON.parse(json));
+    let out = null;
+    if (json) out = JSON.parse(json);
+    else {
+      // The model answered in text instead of calling the tool: take the JSON object out of it.
+      const a = text.indexOf("{"), b = text.lastIndexOf("}");
+      if (a >= 0 && b > a) out = JSON.parse(text.slice(a, b + 1));
+    }
+    if (!out) throw new Error("no plan in response: " + text.slice(0, 200));
+    const result = build(input, out);
     send(result);
   } catch (e) {
     console.error(e);
