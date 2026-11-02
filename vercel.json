@@ -37,6 +37,10 @@
     {
       "source": "/me",
       "destination": "/index.html"
+    },
+    {
+      "source": "/start",
+      "destination": "/index.html"
     }
   ],
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)done.json'"

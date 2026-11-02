@@ -1,6 +1,6 @@
 // Decides whose plan this device shows, and runs the "make your plan" screen.
-//   /me            Caleb's plan (data.js) plus his Strava runs (/api/done)
-//   anywhere else  the plan saved on this device, or the setup screen
+//   /start   the plan saved on this device, or the setup form
+//   anything else (/ and /me): Caleb's plan (data.js) plus his Strava runs (done.js)
 (() => {
   const STORE = "miles.plan.v1";
   const OWNER_META = {
@@ -9,23 +9,24 @@
     long: "9:30–10:15", longLate: "9:00–9:45", longSwitch: 14, hrLong: 155,
   };
 
-  const isOwner = location.pathname.replace(/\/+$/, "") === "/me";
+  const path = location.pathname.replace(/\/+$/, "") || "/";
   window.MILES_STORE = STORE;
 
-  if (isOwner) {
+  if (path !== "/start") {
     window.PLAN_META = OWNER_META;
     return;
   }
 
-  window.DONE = {};
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(STORE) || "null"); } catch (e) { saved = null; }
   if (saved && Array.isArray(saved.plan) && saved.plan.length) {
+    window.DONE = {};
     window.PLAN = saved.plan;
     window.PLAN_META = saved.meta || {};
     return;
   }
 
+  window.DONE = {};
   window.PLAN = null;
   document.addEventListener("DOMContentLoaded", showSetup);
   if (document.readyState !== "loading") showSetup();
@@ -123,7 +124,7 @@
         } catch (e3) {
           return back("Your browser blocked saving the plan. Turn off Private Browsing and try again.");
         }
-        setTimeout(() => location.replace(location.pathname), 350);
+        setTimeout(() => location.replace("/start"), 350);
       } catch (e2) {
         back("Couldn't reach the plan writer. Check your connection and try again.");
       }

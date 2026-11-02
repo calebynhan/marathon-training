@@ -2,13 +2,13 @@
 
 Day-by-day marathon training app. Static site plus one serverless function, no build step.
 
-- `/` shows the plan saved on this device. New visitors get a short form, and Claude writes a plan for them.
-- `/me` shows Caleb's plan (sub-3:30 at the Christie Clinic Illinois Marathon, Sat Apr 24, 2027) with his Strava runs.
+- `/` (and `/me`) shows Caleb's plan (sub-3:30 at the Christie Clinic Illinois Marathon, Sat Apr 24, 2027) with his Strava runs.
+- `/start` is for everyone else: a short form, then Claude writes their plan, saved only on their device.
 
 ## Files
 
 - `index.html`, `styles.css`, `app.js`: the app
-- `setup.js`: picks the plan for this page (Caleb's at `/me`, otherwise the one saved on the device) and runs the "Your race" form
+- `setup.js`: picks the plan for this page (the device's own plan at `/start`, Caleb's everywhere else) and runs the "Your race" form
 - `api/plan.js`: Vercel function that writes a plan with Claude and streams progress back. Uses the `ANTHROPIC_API_KEY` env var; the key never reaches the browser
 - `data.js`: Caleb's plan, one entry per day (`d` date, `w` week, `mi` miles, `t` type, `x` steps, `s` strength A/B)
 - `api/done.js`: serves Caleb's Strava runs from the `DONE_JSON` env var, written by the nightly sync (see `SYNC.md`)

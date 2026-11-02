@@ -252,7 +252,7 @@
     np.addEventListener("click", () => {
       if (!armed) { armed = true; np.textContent = "Tap again to replace this plan"; np.classList.add("armed"); return; }
       try { localStorage.removeItem(window.MILES_STORE); } catch (e) { /* ignore */ }
-      location.replace(location.pathname);
+      location.replace("/start");
     });
   }
 
