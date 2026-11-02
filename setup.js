@@ -1,5 +1,5 @@
 // Decides whose plan this device shows, and runs the "make your plan" screen.
-//   /me            Caleb's plan (data.js) plus his Strava runs (done.js)
+//   /me            Caleb's plan (data.js) plus his Strava runs (/api/done)
 //   anywhere else  the plan saved on this device, or the setup screen
 (() => {
   const STORE = "miles.plan.v1";

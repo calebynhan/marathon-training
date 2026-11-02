@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/(data|done)\\.js",
+      "source": "/data.js",
       "headers": [
         {
           "key": "Cache-Control",
@@ -38,5 +38,6 @@
       "source": "/me",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)done.json'"
 }

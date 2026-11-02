@@ -1,0 +1,50 @@
+# Copies Caleb's Strava runs from Vercel (the DONE_JSON env var, served at /api/done)
+# back into done.json in this repo, so git keeps a history of them.
+# The nightly sync runs at 10 PM Central; this runs about an hour later.
+name: Back up Strava runs from Vercel
+
+on:
+  schedule:
+    - cron: "17 5 * * *" # 05:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backup-done
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch runs from Vercel
+        run: |
+          curl -fsS --retry 3 "https://miles-khaki.vercel.app/api/done?format=json" -o /tmp/done.json
+          node - <<'JS'
+          const fs = require("fs");
+          const live = JSON.parse(fs.readFileSync("/tmp/done.json", "utf8"));
+          if (!live || typeof live !== "object" || Array.isArray(live)) throw new Error("Unexpected payload from /api/done");
+          const saved = JSON.parse(fs.readFileSync("done.json", "utf8"));
+          // Never shrink the backup: if Vercel lost a date, keep ours and fail loudly.
+          const missing = Object.keys(saved).filter((k) => !(k in live));
+          if (missing.length) throw new Error(`Vercel is missing ${missing.join(", ")}; not overwriting done.json`);
+          const keys = Object.keys(live).sort();
+          const lines = keys.map((k) => `  ${JSON.stringify(k)}: { "mi": ${Number(live[k].mi).toFixed(1)}, "pace": ${JSON.stringify(live[k].pace)} }`);
+          fs.writeFileSync("done.json", `{\n${lines.join(",\n")}\n}\n`);
+          JS
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- done.json; then
+            echo "No new runs."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add done.json
+          git commit -m "Back up Strava runs from Vercel ($(date -u +%F))"
+          git push
