@@ -1,6 +1,9 @@
 (() => {
   const PLAN = window.PLAN;
+  if (!PLAN) return; // setup screen is showing
+  const META = window.PLAN_META || {};
   const DONE = window.DONE || {};
+  const tracksRuns = Object.keys(DONE).length > 0;
   PLAN.forEach((d) => {
     d.goal = d.mi;
     const r = DONE[d.d];
@@ -56,16 +59,19 @@
     weekRan[d.w] = (weekRan[d.w] || 0) + (d.done ? d.mi : 0);
     if (!(d.w in weekStart)) weekStart[d.w] = d.d;
   });
-  const started = (w) => weekStart[w] <= todayKey();
+  const started = (w) => tracksRuns && weekStart[w] <= todayKey();
   const totalGoal = r1(PLAN.reduce((a, d) => a + d.goal, 0));
   const totalRan = r1(PLAN.reduce((a, d) => a + (d.done ? d.mi : 0), 0));
 
   function paceLine(d) {
+    const hr = (n) => (n ? `, heart rate under ${n}` : "");
     switch (d.t) {
       case "Easy": case "Recovery": case "Shakeout": case "Medium-long":
-        return "<b>9:15–10:15</b> /mi, heart rate under 150";
-      case "Long":
-        return (d.w <= 13 ? "<b>9:30–10:15</b>" : "<b>9:00–9:45</b>") + " /mi, heart rate under 155";
+        return META.easy ? `<b>${META.easy}</b> /mi${hr(META.hrEasy)}` : "";
+      case "Long": {
+        const p = META.longLate && d.w >= META.longSwitch ? META.longLate : META.long;
+        return p ? `<b>${p}</b> /mi${hr(META.hrLong)}` : "";
+      }
       default:
         return "";
     }
@@ -220,7 +226,9 @@
     btn.setAttribute("aria-label", v === "day" ? "Show calendar" : "Show day");
     if (v === "cal") {
       renderCal();
-      $("dateBtn").innerHTML = `Plan<span class="tally"><b>${fmtMi(totalRan)}</b> of ${fmtMi(totalGoal)} mi</span>`;
+      $("dateBtn").innerHTML = tracksRuns
+        ? `Plan<span class="tally"><b>${fmtMi(totalRan)}</b> of ${fmtMi(totalGoal)} mi</span>`
+        : `Plan<span class="tally">${fmtMi(totalGoal)} mi</span>`;
       $("dateBtn").classList.add("is-today");
       const cur = document.querySelector(".row.current");
       if (cur) cur.scrollIntoView({ block: "center" });
@@ -233,6 +241,19 @@
     sel = i;
     renderDay(true);
     history.replaceState(null, "", `#${PLAN[sel].d}`);
+  }
+
+  // Plans made on this device: show the coach's note and allow replacing the plan
+  if (!META.owner) {
+    if (META.note) { $("planNote").textContent = META.note; $("planNote").hidden = false; }
+    const np = $("newPlan");
+    np.hidden = false;
+    let armed = false;
+    np.addEventListener("click", () => {
+      if (!armed) { armed = true; np.textContent = "Tap again to replace this plan"; np.classList.add("armed"); return; }
+      try { localStorage.removeItem(window.MILES_STORE); } catch (e) { /* ignore */ }
+      location.replace(location.pathname);
+    });
   }
 
   // Events

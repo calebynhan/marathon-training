@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon-180.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
 <div class="scene" aria-hidden="true">
@@ -39,6 +39,70 @@
     <button class="date" id="dateBtn" type="button" aria-label="Jump to today"></button>
     <button class="icon" id="viewBtn" type="button" aria-label="Show calendar"></button>
   </header>
+
+  <main id="setup" class="view setup" hidden>
+    <form id="setupForm" class="setupform" novalidate>
+      <h1 class="setuptitle">Your race</h1>
+      <label class="field">
+        <span>Race</span>
+        <input id="fRace" name="race" type="text" autocomplete="off" placeholder="Illinois Marathon" maxlength="60">
+      </label>
+      <div class="field">
+        <span id="lDist">Distance</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lDist" data-name="distance">
+          <button type="button" role="radio" data-v="26.2" aria-checked="true">Marathon</button>
+          <button type="button" role="radio" data-v="13.1" aria-checked="false">Half</button>
+        </div>
+      </div>
+      <div class="pair">
+        <label class="field">
+          <span>Race day</span>
+          <input id="fDate" name="date" type="date" required>
+        </label>
+        <label class="field">
+          <span>Goal time</span>
+          <input id="fGoal" name="goal" type="text" placeholder="3:30" autocomplete="off" required>
+        </label>
+      </div>
+      <div class="pair">
+        <label class="field">
+          <span>Miles a week now</span>
+          <input id="fWeekly" name="weekly" type="number" inputmode="numeric" min="0" max="120" placeholder="15" required>
+        </label>
+        <label class="field">
+          <span>Longest run lately</span>
+          <input id="fLongest" name="longest" type="number" inputmode="decimal" min="0" max="30" step="0.5" placeholder="6" required>
+        </label>
+      </div>
+      <div class="field">
+        <span id="lDays">Run days a week</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lDays" data-name="days">
+          <button type="button" role="radio" data-v="3" aria-checked="false">3</button>
+          <button type="button" role="radio" data-v="4" aria-checked="false">4</button>
+          <button type="button" role="radio" data-v="5" aria-checked="true">5</button>
+          <button type="button" role="radio" data-v="6" aria-checked="false">6</button>
+          <button type="button" role="radio" data-v="7" aria-checked="false">7</button>
+        </div>
+      </div>
+      <label class="field">
+        <span>Anything else <em>optional</em></span>
+        <textarea id="fNotes" name="notes" rows="2" maxlength="400" placeholder="Injuries, days you can't run"></textarea>
+      </label>
+      <label class="field" id="codeField" hidden>
+        <span>Access code</span>
+        <input id="fCode" name="code" type="text" autocomplete="off">
+      </label>
+      <p class="formerr" id="formErr" role="alert"></p>
+      <button class="go" id="goBtn" type="submit">Make my plan</button>
+    </form>
+
+    <div class="making" id="making" hidden aria-live="polite">
+      <svg class="sprig grow" viewBox="0 0 96 96" aria-hidden="true"><path d="M20 84 C34 64 48 46 74 22" fill="none" stroke="#8fae6a" stroke-width="2.5" stroke-linecap="round"/><path d="M40 58 C30 52 24 40 28 30 C40 34 46 46 40 58Z" fill="#c8dba6"/><path d="M54 42 C64 30 76 28 84 32 C80 44 66 48 54 42Z" fill="#b3cc8a"/><path d="M30 72 C20 70 12 62 12 54 C24 54 32 62 30 72Z" fill="#d8e5c0"/><path d="M66 30 C62 20 64 12 70 6 C76 14 74 24 66 30Z" fill="#c8dba6"/></svg>
+      <p class="makingtitle">Writing your plan</p>
+      <div class="meter" role="progressbar" aria-label="Plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="meterFill"></span></div>
+      <p class="makinghint">About a minute. Keep this open.</p>
+    </div>
+  </main>
 
   <main id="day" class="view day" aria-live="polite">
     <section class="hero" id="hero">
@@ -68,7 +132,9 @@
     <div class="calhead" aria-hidden="true">
       <span></span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span></span>
     </div>
+    <p class="plannote" id="planNote" hidden></p>
     <div class="grid" id="grid" role="grid" aria-label="Training calendar"></div>
+    <button class="newplan" id="newPlan" type="button" hidden>New plan</button>
   </main>
 </div>
 
@@ -85,6 +151,7 @@
 
 <script src="data.js"></script>
 <script src="done.js"></script>
+<script src="setup.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
