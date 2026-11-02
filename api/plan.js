@@ -145,6 +145,7 @@ function build(i, out) {
       let x = Array.isArray(src.x) ? src.x.filter((s) => typeof s === "string").slice(0, 4).map((s) => s.slice(0, 48)) : [];
       let s = src.s === "A" || src.s === "B" ? src.s : null;
       if (t === "Rest" || mi === 0) { t = "Rest"; mi = 0; x = []; }
+      if (t === "Marathon pace" && i.dist !== 26.2) t = "Race pace";
       if (d < todayK && d > key(addDays(i.planStart, -1))) { t = "Rest"; mi = 0; x = []; s = null; }
       if (d === raceK) { t = "Race"; mi = i.dist; x = [i.race, `Goal ${g}`, `${gp} /mi`]; s = null; }
       if (d > raceK) { t = "Rest"; mi = 0; x = []; s = null; }
